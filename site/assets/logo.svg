@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="dokidoki">
+  <mask id="m">
+    <rect width="64" height="64" fill="#fff"/>
+    <g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 22A19 19 0 0 1 47 20"/>
+      <path d="M49 42A19 19 0 0 1 17 44"/>
+      <path d="M7 33H19L24 25L30 42L35 20L40 33H57"/>
+    </g>
+    <path d="M53 13L52 26L41 22Z M11 51L12 38L23 42Z" fill="#000"/>
+  </mask>
+  <rect x="2" y="2" width="60" height="60" rx="13" fill="#d23a2b" mask="url(#m)"/>
+</svg>

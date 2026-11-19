@@ -1,0 +1,25 @@
+[package]
+name = "doki"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "../../README.md"
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+doki-agent.workspace = true
+doki-core.workspace = true
+doki-ui.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+ksni.workspace = true
+libc = "0.2"
+serde_json.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

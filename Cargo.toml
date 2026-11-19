@@ -1,0 +1,33 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Watch git repositories and auto-commit changes with AI-written messages, then sync them to their remotes."
+repository = "https://github.com/henrychea/dokidoki"
+homepage = "https://github.com/henrychea/dokidoki"
+readme = "README.md"
+keywords = ["git", "commit", "ai", "sync", "gpui"]
+categories = ["command-line-utilities", "development-tools", "gui"]
+
+[workspace.dependencies]
+doki-agent = { path = "crates/doki-agent", version = "0.1.0" }
+doki-core = { path = "crates/doki-core", version = "0.1.0" }
+doki-ui = { path = "crates/doki-ui", version = "0.1.0" }
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+globset = "0.4"
+gpui-kit = "=0.10.0"
+ksni = { version = "0.3", features = ["blocking"] }
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+toml = "0.9"
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-subscriber = { version = "0.3", features = ["fmt", "registry"] }
+walkdir = "2"

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>dokidoki — Engineering Console</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..600,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #faf9f5;
+        color: #4a4a50;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #dfded5;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #c9c7bd;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 18;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            washi: {
+              50: '#ffffff',
+              100: '#faf9f5',
+              200: '#f7f6f1',
+              300: '#f2f1eb',
+              400: '#e6e4dc',
+              500: '#dfded5',
+              600: '#c9c7bd',
+            },
+            sumi: {
+              900: '#19191b',
+              800: '#28282c',
+              700: '#4a4a50',
+              600: '#64636b',
+              500: '#7c7b85',
+              400: '#9b99a4',
+              300: '#b8b6c1',
+            },
+            shuiro: {
+              DEFAULT: '#c53022',
+              soft: 'rgba(197, 48, 34, 0.08)',
+              border: '#f0c2bd',
+              solid: '#dc3b2c',
+            },
+            yamabuki: {
+              DEFAULT: '#c27803',
+              soft: 'rgba(194, 120, 3, 0.08)',
+              border: '#f2dfbc',
+            },
+            tokiwa: {
+              DEFAULT: '#2b7a4b',
+              soft: 'rgba(43, 122, 75, 0.08)',
+              border: '#bce4cd',
+            },
+            ai: {
+              subtle: '#3b5998',
+              surface: 'rgba(59, 89, 152, 0.07)',
+              border: 'rgba(59, 89, 152, 0.22)',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-washi-100 text-sumi-700 font-sans text-xs antialiased selection:bg-washi-400 selection:text-sumi-900 min-h-screen flex flex-col">
+<!-- ================================================================= -->
+<!-- TOP TITLEBAR & CONTROLS (Washi & Sumi Edition)                   -->
+<!-- ================================================================= -->
+<header class="h-11 border-b border-washi-400 bg-washi-200/90 backdrop-blur-sm flex items-center justify-between px-4 sticky top-0 z-50 select-none">
+<!-- Window controls & brand -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+<span class="w-2.5 h-2.5 rounded-full bg-[#e2736b] transition-colors"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#e5b357] transition-colors"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#5cb87a] transition-colors"></span>
+</div>
+<div class="h-3.5 w-px bg-washi-400"></div>
+<div class="flex items-center gap-2">
+<span class="font-semibold text-sumi-900 tracking-tight text-[13px]">dokidoki</span>
+<span class="font-mono text-[10px] text-sumi-600 tracking-wide px-1.5 py-0.5 rounded bg-washi-300 border border-washi-400">v2.4-gpui</span>
+</div>
+<div class="hidden md:flex items-center gap-1.5 text-sumi-500 font-mono text-[11px] ml-2">
+<span>~/Developer</span>
+<span class="text-washi-600">/</span>
+<span class="text-sumi-700 hover:text-sumi-900 cursor-pointer transition-colors">~/Work</span>
+</div>
+</div>
+<!-- Telemetry status pills & tranquil actions -->
+<div class="flex items-center gap-3">
+<div class="hidden lg:flex items-center gap-2 text-[11px] font-mono text-sumi-500 pr-2 border-r border-washi-400">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa"></span>
+<span>next sync</span>
+<span class="text-sumi-900 font-medium">03:42</span>
+</div>
+<div class="hidden sm:flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded border border-washi-400 text-sumi-600 bg-washi-50 shadow-xs">
+<span>Dry Run</span>
+<span class="w-1.5 h-1.5 rounded-full bg-yamabuki"></span>
+</div>
+<button class="px-2.5 py-1 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 transition-all flex items-center gap-1 text-[11px] shadow-xs">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span>Filter</span>
+</button>
+<button class="px-3 py-1 rounded bg-sumi-900 text-washi-100 font-medium hover:bg-sumi-800 transition-all flex items-center gap-1.5 text-[11px] shadow-sm">
+<span class="material-symbols-outlined text-[13px] text-washi-100">cached</span>
+<span>Sync All</span>
+</button>
+<div class="w-6 h-6 rounded-full bg-white border border-washi-400 flex items-center justify-center text-sumi-700 shadow-xs">
+<span class="material-symbols-outlined text-[13px]">person</span>
+</div>
+</div>
+</header>
+<!-- ================================================================= -->
+<!-- MAIN WORKSPACE 3-PANE GPUI LAYOUT (Ma: Negative Space & Balance)  -->
+<!-- ================================================================= -->
+<div class="flex-1 flex overflow-hidden">
+<!-- =============================================================== -->
+<!-- COLUMN 1: LEFT REPOSITORY NAVIGATOR (268px fixed)               -->
+<!-- =============================================================== -->
+<aside class="w-[268px] flex-shrink-0 bg-washi-300 border-r border-washi-400 flex flex-col justify-between">
+<div class="flex-1 overflow-y-auto p-3 space-y-4">
+<!-- Workspace Quick Nav -->
+<div class="space-y-0.5">
+<div class="text-[10px] uppercase font-mono tracking-wider text-sumi-500 px-2 py-1 flex items-center justify-between">
+<span>Workspaces</span>
+<button class="text-sumi-500 hover:text-sumi-900"><span class="material-symbols-outlined text-[13px]">add</span></button>
+</div>
+<a class="flex items-center justify-between px-2 py-1.5 rounded text-sumi-900 bg-white border border-washi-400 shadow-xs" href="#">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-sumi-700">space_dashboard</span>
+<span class="font-medium text-[12px]">All Trees</span>
+</span>
+<span class="font-mono text-[10px] text-sumi-500">4</span>
+</a>
+<a class="flex items-center justify-between px-2 py-1.5 rounded text-sumi-700 hover:text-sumi-900 hover:bg-washi-200 transition-colors" href="#">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-sumi-500">difference</span>
+<span class="font-normal text-[12px]">Diff Inspector</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-yamabuki"></span>
+</a>
+<a class="flex items-center justify-between px-2 py-1.5 rounded text-sumi-700 hover:text-sumi-900 hover:bg-washi-200 transition-colors" href="#">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-sumi-500">auto_awesome</span>
+<span class="font-normal text-[12px]">AI Commit</span>
+</span>
+<span class="font-mono text-[10px] text-sumi-500">2</span>
+</a>
+</div>
+<div class="h-px bg-washi-400"></div>
+<!-- Root Group 1: ~/Developer -->
+<div class="space-y-1">
+<div class="flex items-center justify-between px-2 py-1 text-sumi-500">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">folder_open</span>
+<span class="font-mono text-[11px] text-sumi-700 font-medium">~/Developer</span>
+</div>
+<span class="font-mono text-[10px] text-sumi-500">3 repos</span>
+</div>
+<!-- doki-core -->
+<div class="group px-2.5 py-2 rounded border border-transparent hover:border-washi-400 hover:bg-white/80 transition-all cursor-pointer">
+<div class="flex items-center justify-between mb-0.5">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa shrink-0"></span>
+<span class="font-mono text-[12px] text-sumi-900 font-medium truncate">doki-core</span>
+</div>
+<span class="font-mono text-[10px] text-sumi-500">main</span>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-sumi-500 pl-3.5">
+<span>Synced</span>
+<span>0↑ 0↓</span>
+</div>
+</div>
+<!-- billing-service (ACTIVE SELECTED) -->
+<div class="group px-2.5 py-2 rounded bg-white border border-washi-400 shadow-xs cursor-pointer relative">
+<div class="absolute left-0 top-2 bottom-2 w-[2px] bg-sumi-900 rounded-r"></div>
+<div class="flex items-center justify-between mb-0.5">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-yamabuki shrink-0"></span>
+<span class="font-mono text-[12px] text-sumi-900 font-semibold truncate">billing-service</span>
+</div>
+<span class="font-mono text-[10px] text-ai-subtle px-1.5 py-0.5 rounded bg-ai-surface border border-ai-border">feat/stripe-v2</span>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono pl-3.5">
+<span class="text-yamabuki font-medium">3 dirty files</span>
+<span class="text-sumi-500">codex</span>
+</div>
+</div>
+<!-- analytics-pipeline -->
+<div class="group px-2.5 py-2 rounded border border-transparent hover:border-washi-400 hover:bg-white/80 transition-all cursor-pointer">
+<div class="flex items-center justify-between mb-0.5">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-sumi-400 shrink-0"></span>
+<span class="font-mono text-[12px] text-sumi-700 group-hover:text-sumi-900 truncate">analytics-pipeline</span>
+</div>
+<span class="font-mono text-[10px] text-sumi-500">scan...</span>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono text-sumi-500 pl-3.5">
+<span>omp: analyzing</span>
+<span>1.2s</span>
+</div>
+</div>
+</div>
+<!-- Root Group 2: ~/Work -->
+<div class="space-y-1">
+<div class="flex items-center justify-between px-2 py-1 text-sumi-500">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">work_outline</span>
+<span class="font-mono text-[11px] text-sumi-700 font-medium">~/Work</span>
+</div>
+<span class="font-mono text-[10px] text-sumi-500">2 repos</span>
+</div>
+<!-- legacy-auth (CRITICAL / SHU-IRO ACCENT) -->
+<div class="px-2.5 py-2 rounded bg-shuiro-soft border border-shuiro-border hover:border-shuiro transition-all cursor-pointer">
+<div class="flex items-center justify-between mb-0.5">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-1.5 h-1.5 rounded-full bg-shuiro shrink-0"></span>
+<span class="font-mono text-[12px] text-sumi-900 font-semibold truncate">legacy-auth</span>
+</div>
+<span class="font-mono text-[10px] text-shuiro tracking-wide uppercase px-1.5 py-0.2 rounded bg-white border border-shuiro-border font-medium">blocked</span>
+</div>
+<div class="flex items-center justify-between text-[11px] font-mono pl-3.5 text-sumi-600">
+<span class="text-shuiro font-medium">Diverged upstream</span>
+<span>action required</span>
+</div>
+</div>
+<!-- Detected (Disabled) -->
+<div class="pt-1">
+<div class="flex items-center justify-between px-2 py-1 text-[11px] font-mono text-sumi-500 hover:text-sumi-700 cursor-pointer">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span>Disabled workspace (1)</span>
+</span>
+<span class="text-[10px]">mobile-app</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Left Footprint: Quiet Daemon Status -->
+<div class="p-3 border-t border-washi-400 bg-washi-200 text-[11px] font-mono space-y-1.5">
+<div class="flex items-center justify-between text-sumi-500">
+<span class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa"></span>
+<span class="text-sumi-700 font-medium">systemd: doki.timer</span>
+</span>
+<span>every 20m</span>
+</div>
+<div class="flex items-center justify-between text-sumi-500">
+<span>Safe Guards v2</span>
+<span class="text-tokiwa font-semibold">Armed</span>
+</div>
+</div>
+</aside>
+<!-- =============================================================== -->
+<!-- COLUMN 2: CENTER WORKSPACE (Diff, AI Studio, Pre-flight)        -->
+<!-- =============================================================== -->
+<main class="flex-1 flex flex-col min-w-0 bg-washi-100 overflow-y-auto">
+<!-- Center Repo Summary & Pre-Flight Banner -->
+<section class="border-b border-washi-400 px-6 py-4 bg-white/60">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+<div class="flex items-center gap-3">
+<h1 class="text-sumi-900 font-semibold text-base tracking-tight font-sans">billing-service</h1>
+<span class="font-mono text-[11px] text-ai-subtle px-2 py-0.5 rounded bg-ai-surface border border-ai-border">feat/stripe-v2</span>
+<span class="text-sumi-500 font-mono text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">arrow_upward</span> Ahead 1
+              <span class="text-washi-600">·</span>
+<span class="text-sumi-600">Worktree dirty</span>
+</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 font-mono text-[11px] transition-colors flex items-center gap-1.5 shadow-xs">
+<span class="material-symbols-outlined text-[13px] text-sumi-500">visibility</span>
+<span>Dry Run</span>
+</button>
+<button class="px-2.5 py-1 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 font-mono text-[11px] transition-colors flex items-center gap-1.5 shadow-xs">
+<span class="material-symbols-outlined text-[13px] text-sumi-500">undo</span>
+<span>Undo</span>
+</button>
+<button class="px-2.5 py-1 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 font-mono text-[11px] transition-colors flex items-center gap-1.5 shadow-xs">
+<span class="material-symbols-outlined text-[13px] text-sumi-500">open_in_new</span>
+<span>Zed</span>
+</button>
+</div>
+</div>
+<!-- Serene Pre-flight Guard Inline Telemetry -->
+<div class="flex flex-wrap items-center gap-6 text-[11px] font-mono text-sumi-500 pt-1 border-t border-washi-400">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa"></span>
+<span class="text-sumi-500">Gitleaks:</span>
+<span class="text-sumi-700 font-medium">0 secrets detected</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa"></span>
+<span class="text-sumi-500">Mass-Change Guard:</span>
+<span class="text-sumi-700 font-medium">14 files / 320 lines &lt; 2,000</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tokiwa"></span>
+<span class="text-sumi-500">Context:</span>
+<span class="text-sumi-700 font-medium">14.2 KB &lt; 60 KB</span>
+</div>
+</div>
+</section>
+<!-- Center Inner Canvas with Ma (Generous, calm spacing) -->
+<div class="p-6 space-y-6">
+<!-- AI Commit Studio (Kanso: Pure, refined utility) -->
+<section class="rounded-lg bg-white border border-washi-400 p-4 space-y-3 shadow-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-sumi-900">auto_awesome</span>
+<h2 class="text-sumi-900 font-semibold text-[13px] tracking-tight">AI Commit Studio</h2>
+<span class="text-washi-500">·</span>
+<span class="font-mono text-[11px] text-sumi-500">codex [gpt-5.2]</span>
+</div>
+<div class="flex items-center gap-2 font-mono text-[11px]">
+<span class="text-sumi-500">Scope:</span>
+<span class="text-sumi-700 px-1.5 py-0.5 rounded bg-washi-200 border border-washi-400">Staged (3 files)</span>
+</div>
+</div>
+<!-- Commit Subject Field with 72-char count -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-[11px] font-mono">
+<span class="text-sumi-500 uppercase text-[10px] tracking-wider">Proposed Subject</span>
+<span class="text-sumi-600 font-medium" id="char-counter">58 / 72</span>
+</div>
+<div class="relative flex items-center bg-washi-100 border border-washi-400 rounded focus-within:border-sumi-900 focus-within:bg-white transition-all">
+<input class="w-full bg-transparent px-3 py-2 text-sumi-900 font-mono text-[12px] focus:outline-none placeholder:text-sumi-400" id="commit-subject" type="text" value="doki: handle idempotent stripe webhook retries and grace periods"/>
+<button class="pr-3 text-sumi-500 hover:text-sumi-900 transition-colors" title="Regenerate">
+<span class="material-symbols-outlined text-[15px]">refresh</span>
+</button>
+</div>
+</div>
+<!-- Studio Actions -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2">
+<button class="px-2.5 py-1.5 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 font-mono text-[11px] transition-colors flex items-center gap-1.5 shadow-xs">
+<span class="material-symbols-outlined text-[13px]">swap_horiz</span>
+<span>Switch to omp (Claude)</span>
+</button>
+<button class="px-2.5 py-1.5 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 border border-washi-400 font-mono text-[11px] transition-colors shadow-xs">
+                Edit Body
+              </button>
+</div>
+<button class="px-4 py-1.5 rounded bg-sumi-900 hover:bg-sumi-800 text-washi-100 font-medium font-sans text-[12px] flex items-center gap-1.5 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[14px] text-washi-100">send</span>
+<span>Commit &amp; Push</span>
+</button>
+</div>
+</section>
+<!-- Staged Changes Diff Inspector (High-clarity code canvas) -->
+<section class="rounded-lg bg-white border border-washi-400 overflow-hidden flex flex-col shadow-xs">
+<!-- File selection tabs -->
+<div class="flex items-center justify-between px-3 border-b border-washi-400 bg-washi-200/70">
+<div class="flex items-center gap-1 overflow-x-auto py-1.5">
+<button class="px-2.5 py-1 rounded bg-white border border-washi-400 text-sumi-900 font-mono text-[11px] flex items-center gap-1.5 shadow-xs">
+<span class="material-symbols-outlined text-[13px] text-ai-subtle">description</span>
+<span class="font-medium">checkout.rs</span>
+<span class="text-sumi-500 text-[10px] ml-1">+42 -6</span>
+</button>
+<button class="px-2.5 py-1 rounded text-sumi-600 hover:text-sumi-900 hover:bg-white font-mono text-[11px] flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[13px] text-sumi-500">description</span>
+<span>stripe.rs</span>
+<span class="text-sumi-500 text-[10px] ml-1">+18 -2</span>
+</button>
+<button class="px-2.5 py-1 rounded text-sumi-600 hover:text-sumi-900 hover:bg-white font-mono text-[11px] flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[13px] text-sumi-500">lock</span>
+<span>Cargo.lock</span>
+<span class="text-sumi-500 text-[10px] ml-1">+120 -10</span>
+</button>
+</div>
+<div class="flex items-center gap-3 text-[11px] font-mono">
+<span class="text-tokiwa font-medium">+180</span>
+<span class="text-shuiro font-medium">-18</span>
+</div>
+</div>
+<!-- Patch Canvas -->
+<div class="p-3 bg-white font-mono text-[12px] leading-5 overflow-x-auto selection:bg-washi-300">
+<div class="flex items-center justify-between text-sumi-500 text-[11px] pb-2 mb-2 border-b border-washi-400">
+<span class="font-medium text-sumi-700">src/subscriptions/checkout.rs</span>
+<span>@@ -128,6 +128,14 @@ impl SubscriptionHandler</span>
+</div>
+<div class="space-y-0.5 text-sumi-700">
+<div class="flex items-start hover:bg-washi-200/50 rounded">
+<span class="w-10 text-sumi-400 text-right pr-4 select-none shrink-0 text-[11px]">128</span>
+<span class="text-sumi-800">  pub async fn process_invoice(&amp;self, event: &amp;StripeEvent) -&gt; Result&lt;()&gt; {</span>
+</div>
+<div class="flex items-start hover:bg-washi-200/50 rounded">
+<span class="w-10 text-sumi-400 text-right pr-4 select-none shrink-0 text-[11px]">129</span>
+<span class="text-sumi-800">      let payload = event.data.object.clone();</span>
+</div>
+<!-- Removed line: subtle Shu-iro / vermilion tint with cinnabar text -->
+<div class="flex items-start bg-[rgba(197,48,34,0.08)] border-l-2 border-shuiro text-[#c53022]">
+<span class="w-10 text-[#c53022]/70 text-right pr-4 select-none shrink-0 text-[11px]">130</span>
+<span class="text-[#c53022] font-medium">-     let sub_id = payload.get("id").ok_or(Error::MissingId)?;</span>
+</div>
+<!-- Added lines: calm tea-leaf / evergreen tint background and forest green text -->
+<div class="flex items-start bg-[rgba(43,122,75,0.08)] border-l-2 border-[#2b7a4b] text-[#236b3f]">
+<span class="w-10 text-[#236b3f]/70 text-right pr-4 select-none shrink-0 text-[11px]">130</span>
+<span class="text-[#236b3f] font-medium">+     let idempotency_key = event.idempotency_key.as_deref().unwrap_or_default();</span>
+</div>
+<div class="flex items-start bg-[rgba(43,122,75,0.08)] border-l-2 border-[#2b7a4b] text-[#236b3f]">
+<span class="w-10 text-[#236b3f]/70 text-right pr-4 select-none shrink-0 text-[11px]">131</span>
+<span class="text-[#236b3f] font-medium">+     if self.journal.has_processed(idempotency_key).await? {</span>
+</div>
+<div class="flex items-start bg-[rgba(43,122,75,0.08)] border-l-2 border-[#2b7a4b] text-[#236b3f]">
+<span class="w-10 text-[#236b3f]/70 text-right pr-4 select-none shrink-0 text-[11px]">132</span>
+<span class="text-[#236b3f] font-medium">+         tracing::info!(%idempotency_key, "Duplicate stripe webhook dropped safely");</span>
+</div>
+<div class="flex items-start bg-[rgba(43,122,75,0.08)] border-l-2 border-[#2b7a4b] text-[#236b3f]">
+<span class="w-10 text-[#236b3f]/70 text-right pr-4 select-none shrink-0 text-[11px]">133</span>
+<span class="text-[#236b3f] font-medium">+         return Ok(());</span>
+</div>
+<div class="flex items-start bg-[rgba(43,122,75,0.08)] border-l-2 border-[#2b7a4b] text-[#236b3f]">
+<span class="w-10 text-[#236b3f]/70 text-right pr-4 select-none shrink-0 text-[11px]">134</span>
+<span class="text-[#236b3f] font-medium">+     }</span>
+</div>
+<div class="flex items-start hover:bg-washi-200/50 rounded">
+<span class="w-10 text-sumi-400 text-right pr-4 select-none shrink-0 text-[11px]">135</span>
+<span class="text-sumi-800">      let sub_id = payload.get("subscription_id").ok_or(Error::MissingId)?;</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- =============================================================== -->
+<!-- COLUMN 3: RIGHT RAIL (Activity Journal & Incidents - 300px)     -->
+<!-- =============================================================== -->
+<aside class="w-[300px] flex-shrink-0 bg-washi-300 border-l border-washi-400 flex flex-col justify-between">
+<!-- Journal Header & Filters -->
+<div class="p-3 border-b border-washi-400 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-sumi-700">receipt_long</span>
+<span class="font-semibold text-sumi-900 text-[12px] tracking-tight">Journal &amp; Logs</span>
+</div>
+<div class="flex items-center gap-1 bg-washi-200 p-0.5 rounded border border-washi-400 font-mono text-[10px]">
+<button class="px-2 py-0.5 rounded bg-white text-sumi-900 font-medium shadow-xs">All</button>
+<button class="px-2 py-0.5 rounded text-sumi-500 hover:text-sumi-900 transition-colors">Runs</button>
+<button class="px-2 py-0.5 rounded text-sumi-500 hover:text-sumi-900 transition-colors">Alerts</button>
+</div>
+</div>
+<!-- Chronological Feed -->
+<div class="flex-1 overflow-y-auto p-3 space-y-3">
+<!-- Entry 1: Gitleaks check -->
+<div class="p-2.5 rounded bg-white border border-washi-400 space-y-1 shadow-xs">
+<div class="flex items-center justify-between font-mono text-[10px]">
+<span class="text-sumi-500">14:32:01</span>
+<span class="text-tokiwa font-semibold">GUARD OK</span>
+</div>
+<div class="text-[11px] font-mono text-sumi-900 font-semibold">billing-service</div>
+<p class="text-[11px] text-sumi-700 leading-relaxed">Gitleaks scan complete. 0 detected credentials in worktree diff.</p>
+</div>
+<!-- Entry 2: doki-core sync successful -->
+<div class="p-2.5 rounded bg-white border border-washi-400 space-y-1 shadow-xs">
+<div class="flex items-center justify-between font-mono text-[10px]">
+<span class="text-sumi-500">14:30:15</span>
+<span class="text-tokiwa font-semibold">SYNCED</span>
+</div>
+<div class="text-[11px] font-mono text-sumi-900 font-semibold">doki-core <span class="text-sumi-500 font-normal">→ origin/main</span></div>
+<div class="flex items-center justify-between text-[10px] font-mono text-sumi-500 pt-1 border-t border-washi-400">
+<span>omp (Sonnet)</span>
+<span>1.2s latency</span>
+</div>
+</div>
+<!-- Entry 3: legacy-auth Divergence Incident (Decisive Shu-iro Vermilion) -->
+<div class="p-2.5 rounded bg-shuiro-soft border border-shuiro-border space-y-2">
+<div class="flex items-center justify-between font-mono text-[10px]">
+<span class="text-shuiro font-bold">14:20:00 · BLOCKED</span>
+<span class="w-1.5 h-1.5 rounded-full bg-shuiro"></span>
+</div>
+<div>
+<div class="text-[11px] font-mono text-sumi-900 font-semibold">legacy-auth</div>
+<p class="text-[11px] text-sumi-700 mt-0.5 leading-snug">
+              Diverged upstream. Auto-push halted per safety invariant (non-fast-forward).
+            </p>
+</div>
+<!-- Incident Resolution Actions -->
+<div class="flex items-center gap-1.5 pt-1">
+<button class="flex-1 py-1 rounded bg-white hover:bg-washi-200 text-sumi-900 font-mono text-[10px] border border-washi-400 transition-colors shadow-xs">
+              Review
+            </button>
+<button class="flex-1 py-1 rounded bg-white hover:bg-shuiro-soft text-shuiro border border-shuiro-border font-mono text-[10px] transition-colors font-medium shadow-xs">
+              Abort
+            </button>
+<button class="py-1 px-2 rounded bg-white hover:bg-washi-200 text-sumi-700 hover:text-sumi-900 font-mono text-[10px] border border-washi-400 transition-colors shadow-xs">
+              Retry
+            </button>
+</div>
+</div>
+</div>
+<!-- Sync Latency Rhythm (Quiet Sparkline) -->
+<div class="p-3 border-t border-washi-400 bg-washi-200 text-sumi-500 space-y-2">
+<div class="flex items-center justify-between text-[11px] font-mono">
+<span class="text-sumi-500">Daemon Sync Rate</span>
+<span class="text-sumi-800 font-medium">99.8% Deterministic</span>
+</div>
+<div class="h-6 w-full flex items-end gap-1 pt-1">
+<div class="flex-1 bg-washi-400 rounded-xs h-[40%] hover:bg-sumi-500 transition-all" title="0.8s"></div>
+<div class="flex-1 bg-washi-400 rounded-xs h-[60%] hover:bg-sumi-500 transition-all" title="1.1s"></div>
+<div class="flex-1 bg-washi-400 rounded-xs h-[35%] hover:bg-sumi-500 transition-all" title="0.7s"></div>
+<div class="flex-1 bg-washi-400 rounded-xs h-[75%] hover:bg-sumi-500 transition-all" title="1.4s"></div>
+<div class="flex-1 bg-washi-400 rounded-xs h-[50%] hover:bg-sumi-500 transition-all" title="0.9s"></div>
+<div class="flex-1 bg-shuiro/70 rounded-xs h-[90%] hover:bg-shuiro transition-all" title="Conflict blocked"></div>
+<div class="flex-1 bg-washi-400 rounded-xs h-[45%] hover:bg-sumi-500 transition-all" title="0.8s"></div>
+<div class="flex-1 bg-ai-subtle/60 rounded-xs h-[65%] hover:bg-ai-subtle transition-all" title="Current run: 0.84s"></div>
+</div>
+<div class="flex items-center justify-between text-[10px] font-mono text-sumi-500">
+<span>Past 12h</span>
+<span>Avg: 0.84s</span>
+</div>
+</div>
+</aside>
+</div>
+<script>
+    // Pure, disciplined 72-char counter adherence
+    const commitInput = document.getElementById('commit-subject');
+    const counterBadge = document.getElementById('char-counter');
+    if (commitInput && counterBadge) {
+      commitInput.addEventListener('input', (e) => {
+        const len = e.target.value.length;
+        counterBadge.textContent = `${len} / 72`;
+        if (len > 72) {
+          counterBadge.className = 'text-shuiro font-semibold';
+        } else if (len > 65) {
+          counterBadge.className = 'text-yamabuki font-semibold';
+        } else {
+          counterBadge.className = 'text-sumi-600 font-medium';
+        }
+      });
+    }
+  </script>
+</body></html>

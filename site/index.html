@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dokidoki — AI git auto-commit &amp; auto-sync for Linux</title>
+<meta name="description" content="dokidoki (from 同期, dōki: to sync) auto-commits and auto-syncs your git repos with AI commit messages. A safe, local-first Rust + GPUI desktop app and CLI for Linux: never force-pushes, scans for secrets, supports dry run and undo.">
+<link rel="canonical" href="https://henrychea.github.io/dokidoki/">
+<meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="dokidoki">
+<meta property="og:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux">
+<meta property="og:description" content="Auto-commit and auto-sync your git repos with AI commit messages. Local-first, never force-pushes, dry run and undo.">
+<meta property="og:url" content="https://henrychea.github.io/dokidoki/">
+<meta property="og:image" content="https://henrychea.github.io/dokidoki/assets/sumi.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="1024">
+<meta property="og:image:alt" content="The dokidoki desktop app in the Sumi dark theme">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux">
+<meta name="twitter:description" content="Auto-commit and auto-sync your git repos with AI commit messages. Local-first, never force-pushes, dry run and undo.">
+<meta name="twitter:image" content="https://henrychea.github.io/dokidoki/assets/sumi.png">
+<meta name="twitter:image:alt" content="The dokidoki desktop app in the Sumi dark theme">
+<link rel="preload" href="assets/fonts/Inter-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="style.css">
+<script>try{var t=localStorage.getItem("doki-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "dokidoki",
+  "alternateName": "doki",
+  "description": "Auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux.",
+  "url": "https://henrychea.github.io/dokidoki/",
+  "operatingSystem": "Linux",
+  "applicationCategory": "DeveloperApplication",
+  "image": "https://henrychea.github.io/dokidoki/assets/sumi.png",
+  "license": "https://opensource.org/licenses/MIT",
+  "codeRepository": "https://github.com/henrychea/dokidoki",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script src="main.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
+  <symbol id="brush" viewBox="0 0 600 24">
+    <path d="M4 14 C60 6 110 9 170 11 C240 13 290 6 360 9 C430 12 490 7 560 10 C580 11 592 13 596 15 C560 16 520 19 450 17 C380 15 320 21 250 19 C180 17 120 20 60 18 C30 17 12 17 4 14 Z"/>
+    <path d="M520 9 C540 4 566 5 584 9 C566 10 548 11 520 9 Z" opacity=".55"/>
+    <circle cx="590" cy="20" r="2" opacity=".5"/>
+  </symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="dokidoki home">
+      <img src="assets/logo.svg" alt="" width="28" height="28">
+      <span>dokidoki</span>
+    </a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#safety">Safety</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to light theme" data-theme-toggle>
+      <span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="petals" aria-hidden="true"></div>
+    <p class="tate" lang="ja" aria-hidden="true"><span>同期</span><small>ドキドキ</small></p>
+    <div class="wrap hero-in">
+      <div class="hero-copy">
+        <div class="hanko" aria-hidden="true">
+          <img src="assets/logo.svg" alt="" width="96" height="96">
+        </div>
+        <p class="eyebrow"><span lang="ja">同期</span> dōki · to sync</p>
+        <h1 id="hero-title">Your repos, with a <span class="beat">heartbeat</span>.</h1>
+        <p class="lede">dokidoki — auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux.</p>
+        <p class="pun">Doubled, doki-doki also echoes <span lang="ja">ドキドキ</span>, the sound of a racing heart: every sync is a heartbeat.</p>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/henrychea/dokidoki">View on GitHub</a>
+          <a class="btn ghost" href="#install">Install</a>
+        </div>
+        <ul class="pills" aria-label="Highlights">
+          <li>Never force-push</li>
+          <li>Dry run</li>
+          <li>Undo</li>
+          <li>Secret scan</li>
+        </ul>
+      </div>
+      <figure class="term" aria-label="Terminal demo: doki status, then doki sync writing an AI commit message">
+        <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>~/Developer</span></div>
+        <pre class="term-body" data-typed><code><span class="p">$</span> doki status
+<span class="m">REPO               BRANCH          STATE</span>
+analytics-pipeline main            <span class="ok">clean</span>
+billing-service    feat/stripe-v2  <span class="warn">3 dirty files</span>
+doki-core          main            <span class="ok">clean</span>
+<span class="p">$</span> doki sync --repo billing-service
+<span class="m">guard   gitleaks: 0 secrets · 3 files / 18 lines</span>
+<span class="m">agent   codex [gpt-5.2] · 1.0s</span>
+<span class="ok">commit</span>  doki: handle idempotent stripe webhook retries
+<span class="ok">push</span>    feat/stripe-v2 → origin <span class="heart">♥ doki doki</span></code></pre>
+        <svg class="ecg" viewBox="0 0 400 40" aria-hidden="true" focusable="false"><path d="M0 22 H140 L152 22 L160 8 L170 34 L180 4 L190 22 H230 L240 16 L248 22 H400"/></svg>
+      </figure>
+    </div>
+  </section>
+
+  <svg class="brush" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="screens" aria-labelledby="screens-title">
+    <div class="wrap">
+      <div class="label"><span lang="ja" class="kanji">画面</span><span>Screens</span></div>
+      <h2 id="screens-title">Sumi ink by night, washi paper by day</h2>
+      <p class="sub">Repository tree, diff inspector, AI Commit Studio, and a journal of every run. Two themes, bundled fonts.</p>
+      <div class="swap" role="group" aria-label="Screenshot theme">
+        <button type="button" aria-pressed="true" data-shot="sumi">Sumi dark</button>
+        <button type="button" aria-pressed="false" data-shot="washi">Washi light</button>
+      </div>
+      <figure class="shot">
+        <img id="shot" src="assets/sumi.png" width="1280" height="1024" loading="lazy" decoding="async"
+             alt="dokidoki in the Sumi dark theme: repository tree on the left, AI Commit Studio with a proposed doki: subject and a diff in the center, journal and logs on the right">
+      </figure>
+    </div>
+  </section>
+
+  <svg class="brush flip" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <div class="label"><span lang="ja" class="kanji">機能</span><span>Features</span></div>
+      <h2 id="features-title">The commit loop nobody does reliably, done for you</h2>
+      <ul class="cards">
+        <li class="card" data-stamp="筆">
+          <h3>AI commit messages</h3>
+          <p>Uses the Claude Code (<code>claude</code>), Codex (<code>codex</code>), OpenCode, <code>omp</code>, or <code>pi</code> CLI you already have. Per-repo overrides, a fallback chain, and a deterministic message when no agent can answer.</p>
+        </li>
+        <li class="card" data-stamp="時">
+          <h3>Scheduled backup &amp; push</h3>
+          <p>Many repositories at once. Cron per root, jitter, exponential backoff, and quarantine after repeated failures.</p>
+        </li>
+        <li class="card" data-stamp="探">
+          <h3>Repository discovery</h3>
+          <p>Finds repositories under one or more roots at a configurable depth. A discovered repository stays disabled until you enable it.</p>
+        </li>
+        <li class="card" data-stamp="試">
+          <h3>Dry run everywhere</h3>
+          <p><code>doki --dry-run</code>, <code>doki sync --dry-run</code>, or the in-app toggle. The planned git argv is shown; nothing mutates.</p>
+        </li>
+        <li class="card" data-stamp="戻">
+          <h3>Undo</h3>
+          <p>Restores the pre-sync snapshot, only when HEAD still matches the run and the run did not push.</p>
+        </li>
+        <li class="card" data-stamp="記">
+          <h3><span lang="ja" class="kanji-inline">記録</span> Journal, app &amp; CLI</h3>
+          <p>Rust + GPUI desktop app with repository tree, diff inspector, AI Commit Studio, and a journal of every run. Plus a full CLI and tray.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <svg class="brush" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="safety" aria-labelledby="safety-title">
+    <div class="wrap safety">
+      <div>
+        <div class="label"><span lang="ja" class="kanji">安全</span><span>Safety</span></div>
+        <h2 id="safety-title">Every destructive shortcut is refused</h2>
+        <p class="sub">Local-first: no account, no telemetry, no token storage. Credentials come from your existing git configuration and credential helper.</p>
+        <div class="seal" aria-hidden="true"><span lang="ja">安全</span></div>
+      </div>
+      <ul class="guarantees">
+        <li>No git <code>--force</code>, <code>--no-verify</code>, <code>reset --hard</code>, <code>clean -fd</code>, or amend of published commits.</li>
+        <li><code>main</code> and <code>master</code> are commit-only unless the repository explicitly opts into pushing them.</li>
+        <li>Every sync writes <code>refs/doki/pre-sync/&lt;ts&gt;</code> and a journal row before its first mutation.</li>
+        <li>A repository mid-merge, mid-rebase, mid-cherry-pick, or with <code>index.lock</code> is refused, not repaired.</li>
+        <li>One sync per repository at a time (<code>flock</code> on <code>$GIT_DIR/doki.lock</code>), plus a global scheduler lock.</li>
+        <li>Mass-change and secret guards (gitleaks or the built-in scanner) run before any diff reaches a model. A secret finding blocks the run.</li>
+        <li>A repository's <code>.doki.toml</code> can narrow policy but cannot add a command, enable push, or loosen a guard.</li>
+        <li>Every state change is journaled: what ran, when, why, and what changed.</li>
+      </ul>
+    </div>
+  </section>
+
+  <svg class="brush flip" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="label"><span lang="ja" class="kanji">自動</span><span>How it works</span></div>
+      <h2 id="how-title">Four beats per sync</h2>
+      <ol class="steps">
+        <li><span class="num" lang="ja" aria-hidden="true">一</span><h3>Watch</h3><p>doki watches the roots you choose and discovers the repositories inside. You enable the ones it should manage.</p></li>
+        <li><span class="num" lang="ja" aria-hidden="true">二</span><h3>Guard</h3><p>On each scheduled tick, dirty repositories pass the secret scan and mass-change budget before anything else happens.</p></li>
+        <li><span class="num" lang="ja" aria-hidden="true">三</span><h3>Write</h3><p>A local agent CLI writes the message from the branch, recent subjects, diff stat, and a capped patch. The model never runs git.</p></li>
+        <li><span class="num" lang="ja" aria-hidden="true">四</span><h3>Commit &amp; push</h3><p>doki commits, fetches, fast-forwards when behind, and pushes when ahead. Diverged branches wait for a human.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <svg class="brush" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="install" aria-labelledby="install-title">
+    <div class="wrap">
+      <div class="label"><span lang="ja" class="kanji">導入</span><span>Install</span></div>
+      <h2 id="install-title">Install and quick start</h2>
+      <p class="sub">Linux is the primary target. Install the GPUI build dependencies first (Debian/Ubuntu names):</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>sudo apt-get install -y \
+  build-essential pkg-config \
+  libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev \
+  libfontconfig-dev libvulkan-dev \
+  libx11-xcb-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
+  libxcb-xfixes0-dev libxcb-xkb-dev</code></pre>
+      </div>
+      <p class="sub">Then build and install the binary from a checkout. <code>doki --version</code> and <code>doki doctor</code> confirm the install.</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>git clone https://github.com/henrychea/dokidoki.git
+cd dokidoki
+cargo install --path crates/doki</code></pre>
+      </div>
+      <h3 class="h3">Quick start</h3>
+      <p class="sub">1. Point doki at your repositories in <code>${XDG_CONFIG_HOME:-~/.config}/doki/config.toml</code>:</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>[[roots]]
+name = "dev"
+path = "~/Developer"
+max_depth = 2
+schedule = "*/20 * * * *"</code></pre>
+      </div>
+      <p class="sub">2. Open the window, enable repositories in <strong>All Trees</strong>, then preview and sync:</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>doki
+doki doctor
+doki sync --all --dry-run
+doki sync --all</code></pre>
+      </div>
+      <p class="sub">Run <code>doki install-timer</code> to keep syncing while the window is closed. Optional: <a href="https://github.com/gitleaks/gitleaks">gitleaks</a> on <code>PATH</code>.</p>
+    </div>
+  </section>
+
+  <svg class="brush flip" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="compare" aria-labelledby="compare-title">
+    <div class="wrap">
+      <div class="label"><span lang="ja" class="kanji">比較</span><span>Compare</span></div>
+      <h2 id="compare-title">How it compares</h2>
+      <p class="sub">dokidoki is aimed at unattended, multi-repository commit-and-push with guardrails.</p>
+      <table class="cmp">
+        <thead><tr><th scope="col">Tool</th><th scope="col">What it does</th><th scope="col">How doki differs</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>git-auto-commit</code> and editor save hooks</th><td data-label="What it does">Commit from inside an editor when a file is saved</td><td data-label="How doki differs">doki runs outside the editor, discovers repositories under your roots, and works on a schedule with guards, push handling, and a journal</td></tr>
+          <tr><th scope="row">cron plus <code>git commit -am</code></th><td data-label="What it does">Commits tracked changes with a fixed message on a timer</td><td data-label="How doki differs">doki writes a message from the diff, scans for secrets, enforces a mass-change budget, supports dry run and undo, and handles fetch, divergence, and push</td></tr>
+          <tr><th scope="row">GitHub Desktop</th><td data-label="What it does">Interactive desktop client for staging, committing, and pushing a repository</td><td data-label="How doki differs">doki is unattended and multi-repository; GitHub Desktop is a manual, one-repository-at-a-time workflow</td></tr>
+          <tr><th scope="row">gitwatch</th><td data-label="What it does">Watches a path and commits changes as they happen</td><td data-label="How doki differs">doki schedules across several roots, generates messages, scans before model calls, and manages the remote side of the sync</td></tr>
+          <tr><th scope="row">git-sync</th><td data-label="What it does">Small script that periodically commits and syncs a single repository</td><td data-label="How doki differs">doki is a desktop app plus CLI with a multi-repository journal, agent adapters, and safety invariants enforced in code</td></tr>
+          <tr><th scope="row">lazygit</th><td data-label="What it does">Interactive terminal UI for everyday git operations</td><td data-label="How doki differs">lazygit is manual by design; doki automates the commit and push loop and keeps a review UI for the times you want to look</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <svg class="brush" aria-hidden="true" focusable="false"><use href="#brush"/></svg>
+
+  <section class="sec" id="faq" aria-labelledby="faq-title">
+    <div class="wrap narrow">
+      <div class="label"><span lang="ja" class="kanji">質問</span><span>FAQ</span></div>
+      <h2 id="faq-title">Questions</h2>
+      <details>
+        <summary>Why the name?</summary>
+        <p><span lang="ja">同期</span> (dōki) is Japanese for synchronization, to sync. Doubled, doki-doki sounds like <span lang="ja">ドキドキ</span>, the sound of a pounding heart, so every sync gets a little heartbeat.</p>
+      </details>
+      <details>
+        <summary>How do I auto-commit git changes?</summary>
+        <p>Add the folder that holds your repositories to <code>config.toml</code>, open <code>doki</code>, and enable the repositories you want managed. Each root has a cron schedule; on each tick doki checks the working tree, and a repository with tracked changes gets a commit with a message written from the diff.</p>
+      </details>
+      <details>
+        <summary>How do I automatically push to GitHub on a schedule?</summary>
+        <p>Keep <code>push_mode = "push"</code> (the default). After committing, doki fetches the repository's upstream, fast-forwards when the branch is only behind, and pushes when it is ahead. <code>main</code> and <code>master</code> stay commit-only until that repository opts in. <code>doki install-timer</code> keeps the schedule running with the window closed.</p>
+      </details>
+      <details>
+        <summary>Can doki generate git commit messages with AI?</summary>
+        <p>Yes. doki builds a prompt from the branch, recent subjects, the diff stat, and a capped patch, then calls a local agent CLI. It supports Claude Code (<code>claude</code>), Codex, OpenCode, <code>omp</code>, and <code>pi</code>, with a model per CLI. The model never runs git and never sees the repository working tree; doki creates the commit itself.</p>
+      </details>
+      <details>
+        <summary>Does it work without AI?</summary>
+        <p>Yes. Set <code>[agent] order = []</code>, or leave no agent installed. doki falls back to a deterministic message such as <code>doki: update 3 files (src, docs)</code>, and the run is marked as a fallback. Guarding, committing, pushing, journaling, and undo all work the same.</p>
+      </details>
+      <details>
+        <summary>Is it safe? Will it force-push or commit a secret?</summary>
+        <p>doki never force-pushes. Diverged branches stop and wait for a human, protected branches are not pushed without an opt-in, and repositories in the middle of a merge, rebase, or cherry-pick are refused. Before a diff reaches a model, gitleaks (or the built-in scanner) and a mass-change guard run; a finding blocks the run. Dry run and pre-sync snapshots let you preview and undo.</p>
+      </details>
+      <details>
+        <summary>Which AI CLIs are supported?</summary>
+        <p>Claude Code (<code>claude</code>), Codex (<code>codex</code>), OpenCode (<code>opencode</code>), <code>omp</code>, and <code>pi</code>. Each has an adapter with its own non-interactive invocation and model flag. <code>doki agents test</code> proves an adapter works before you rely on it.</p>
+      </details>
+      <details>
+        <summary>Does it sync while the window is closed?</summary>
+        <p>Yes. Run <code>doki run --background</code> for a scheduler with an optional tray icon, or run <code>doki install-timer</code> to generate a systemd user timer that calls <code>doki sync --due</code>. doki never edits your crontab.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <p><img src="assets/logo.svg" alt="" width="20" height="20"> dokidoki · MIT License · <a href="https://github.com/henrychea/dokidoki">GitHub</a></p>
+    <p class="m">Set in Inter and JetBrains Mono, both under the SIL Open Font License 1.1 (<a href="assets/fonts/Inter-OFL.txt">Inter</a>, <a href="assets/fonts/JetBrainsMono-OFL.txt">JetBrains Mono</a>). No trackers, no cookies.</p>
+  </div>
+</footer>
+<p class="sr" aria-live="polite" id="status"></p>
+</body>
+</html>
