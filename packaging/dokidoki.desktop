@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=dokidoki
+GenericName=Git Auto-Commit
+Comment=Watch git repositories and auto-commit changes with AI-written messages, then sync them to their remotes.
+Exec=doki
+Icon=dokidoki
+Terminal=false
+Categories=Development;RevisionControl;
+Keywords=git;commit;sync;backup;repository;

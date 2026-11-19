@@ -55,3 +55,49 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
+
+  build:
+    name: release binary
+    needs: gates
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install GPUI system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config \
+            libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev \
+            libfontconfig-dev libvulkan-dev \
+            libx11-xcb-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
+            libxcb-xfixes0-dev libxcb-xkb-dev
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked -p doki
+
+      - name: Strip
+        run: |
+          strip target/release/doki
+          cp target/release/doki ./doki
+
+      - name: Smoke test
+        run: |
+          ./doki --version
+          ./doki --help
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: doki-linux-x86_64
+          path: doki
+          if-no-files-found: error
+          retention-days: 7

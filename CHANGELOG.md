@@ -6,7 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- Linux release packaging: `Release` workflow builds `x86_64` and `aarch64`
+  AppImages and `-unknown-linux-gnu` tarballs with a `SHA256SUMS` file, and
+  publishes them to a GitHub Release on a `v*` tag. `CI` now also builds,
+  strips, smoke-tests, and uploads the Linux binary as an artifact.
 
 ## [0.1.0] - 2026-11-19
 

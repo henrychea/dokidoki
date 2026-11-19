@@ -67,8 +67,78 @@ guardrails. These tools overlap, but they solve different parts of the problem.
 
 ## Install
 
-Linux is the primary target. Install the GPUI build dependencies first
-(Debian/Ubuntu names):
+Linux x86_64 and aarch64. Prebuilt AppImages and tarballs are on the
+[releases page](https://github.com/henrychea/dokidoki/releases/latest); building
+from source is documented below.
+
+### Download
+
+```sh
+# AppImage: no install step beyond making it executable
+chmod +x dokidoki-<version>-x86_64.AppImage
+./dokidoki-<version>-x86_64.AppImage
+
+# tarball: extract and put doki on PATH
+tar -xzf doki-<version>-x86_64-unknown-linux-gnu.tar.gz
+install -m755 doki-<version>-x86_64-unknown-linux-gnu/doki ~/.local/bin/doki
+```
+
+Use `aarch64` instead of `x86_64` on ARM. Every release publishes `SHA256SUMS`
+next to the artifacts; run this in the download directory to verify:
+
+```sh
+sha256sum -c SHA256SUMS
+```
+
+The tarball also contains `dokidoki.desktop` and `dokidoki.png` if you want a
+menu entry:
+
+```sh
+install -Dm644 dokidoki.desktop ~/.local/share/applications/dokidoki.desktop
+install -Dm644 dokidoki.png ~/.local/share/icons/hicolor/256x256/apps/dokidoki.png
+```
+
+`doki --version` and `doki doctor` confirm the install.
+
+### Runtime dependencies
+
+The downloads link against the host graphics stack instead of bundling it, so a
+Vulkan driver plus the usual Wayland/X11 client libraries must be present.
+
+Debian/Ubuntu:
+
+```sh
+sudo apt-get install -y \
+  libvulkan1 mesa-vulkan-drivers \
+  libwayland-client0 libxkbcommon0 libxkbcommon-x11-0 \
+  libfontconfig1 fontconfig libxcb1 libxcb-xkb1
+```
+
+Fedora:
+
+```sh
+sudo dnf install -y \
+  vulkan-loader mesa-vulkan-drivers \
+  libxkbcommon libxkbcommon-x11 wayland \
+  fontconfig libxcb
+```
+
+Arch:
+
+```sh
+sudo pacman -S --needed \
+  vulkan-icd-loader vulkan-radeon \
+  libxkbcommon libxkbcommon-x11 wayland \
+  fontconfig libxcb
+```
+
+`libvulkan1`/`vulkan-loader` is the loader; the Vulkan ICD comes from the GPU
+driver, so replace `mesa-vulkan-drivers` or `vulkan-radeon` with the package
+for your GPU (NVIDIA, Intel, or another Mesa ICD).
+
+### Build from source
+
+Install the GPUI build dependencies first (Debian/Ubuntu names):
 
 ```sh
 sudo apt-get install -y \

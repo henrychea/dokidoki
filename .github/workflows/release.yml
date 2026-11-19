@@ -1,0 +1,233 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build every artifact and upload it as a workflow artifact, but do not create a GitHub Release
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  prepare:
+    name: version
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      dry_run: ${{ steps.version.outputs.dry_run }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo_version="$(awk '/^\[workspace\.package\]/{f=1;next} /^\[/{f=0} f && /^version[[:space:]]*=/{gsub(/[",]/,"",$3); print $3; exit}' Cargo.toml)"
+          if [[ -z "$cargo_version" ]]; then
+            echo "::error::could not read version from [workspace.package] in Cargo.toml"
+            exit 1
+          fi
+
+          dry_run="true"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            dry_run="${{ inputs.dry_run }}"
+          fi
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            tag_version="${GITHUB_REF_NAME#v}"
+            if [[ "$tag_version" != "$cargo_version" ]]; then
+              echo "::error::tag ${GITHUB_REF_NAME} does not match workspace version ${cargo_version}"
+              exit 1
+            fi
+            version="$cargo_version"
+          else
+            version="${cargo_version}-dev"
+          fi
+
+          prerelease=false
+          if [[ "$version" == *-* ]]; then
+            prerelease=true
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$dry_run" >> "$GITHUB_OUTPUT"
+          echo "version: $version (prerelease: $prerelease, dry_run: $dry_run)"
+
+  build:
+    name: build ${{ matrix.arch }}
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-22.04
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install GPUI system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config \
+            libwayland-dev libxkbcommon-dev libxkbcommon-x11-dev \
+            libfontconfig-dev libvulkan-dev \
+            libx11-xcb-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
+            libxcb-xfixes0-dev libxcb-xkb-dev
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked -p doki
+
+      - name: Strip
+        run: strip target/release/doki
+
+      - name: Smoke test
+        run: |
+          ./target/release/doki --version
+          ./target/release/doki --help > /dev/null
+
+      - name: Build tarball
+        run: |
+          bash packaging/build-tarball.sh \
+            --binary target/release/doki \
+            --version "$VERSION" \
+            --arch "${{ matrix.arch }}" \
+            --outdir dist
+
+      - name: Build AppImage
+        run: |
+          bash packaging/build-appimage.sh \
+            --binary target/release/doki \
+            --version "$VERSION" \
+            --arch "${{ matrix.arch }}" \
+            --outdir dist
+
+      - name: List artifacts
+        run: ls -lh dist
+
+      - name: Upload tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: doki-${{ env.VERSION }}-${{ matrix.arch }}-unknown-linux-gnu.tar.gz
+          path: dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: dokidoki-${{ env.VERSION }}-${{ matrix.arch }}.AppImage
+          path: dist/*.AppImage
+          if-no-files-found: error
+          retention-days: 7
+
+  checksums:
+    name: checksums
+    needs: [prepare, build]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Write SHA256SUMS
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          sha256sum -- * | tee SHA256SUMS
+          if [[ "$(wc -l < SHA256SUMS)" -ne 4 ]]; then
+            echo "::error::expected four release artifacts"
+            exit 1
+          fi
+
+      - name: Upload SHA256SUMS
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHA256SUMS
+          path: dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: GitHub Release
+    needs: [prepare, build, checksums]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Extract changelog section
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - "${{ needs.prepare.outputs.version }}" > release-notes.md <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          version = sys.argv[1]
+          text = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          heading = re.compile(r"^## \[?v?" + re.escape(version) + r"\]?.*?(?=^## |\Z)", re.M | re.S)
+          match = heading.search(text)
+          if match is None:
+              sys.exit(f"CHANGELOG.md has no section for {version}")
+          print(match.group(0).strip())
+          PY
+          cat release-notes.md
+
+      - name: Verify SHA256SUMS
+        working-directory: dist
+        run: sha256sum -c SHA256SUMS
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ needs.prepare.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          prerelease: ${{ needs.prepare.outputs.prerelease }}
+          fail_on_unmatched_files: true
+          files: dist/*

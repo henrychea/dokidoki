@@ -215,7 +215,30 @@ doki-core          main            <span class="ok">clean</span>
     <div class="wrap">
       <div class="label"><span lang="ja" class="kanji">導入</span><span>Install</span></div>
       <h2 id="install-title">Install and quick start</h2>
-      <p class="sub">Linux is the primary target. Install the GPUI build dependencies first (Debian/Ubuntu names):</p>
+      <p class="sub">Prebuilt Linux builds for x86_64 and aarch64 are on the <a href="https://github.com/henrychea/dokidoki/releases/latest">releases page</a>, with <code>SHA256SUMS</code> alongside every artifact.</p>
+      <h3 class="h3">Download</h3>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code># AppImage: no install step beyond making it executable
+chmod +x dokidoki-&lt;version&gt;-x86_64.AppImage
+./dokidoki-&lt;version&gt;-x86_64.AppImage
+
+# tarball: extract and put doki on PATH
+tar -xzf doki-&lt;version&gt;-x86_64-unknown-linux-gnu.tar.gz
+install -m755 doki-&lt;version&gt;-x86_64-unknown-linux-gnu/doki ~/.local/bin/doki</code></pre>
+      </div>
+      <p class="sub">Verify the downloads with <code>sha256sum -c SHA256SUMS</code>; <code>doki --version</code> and <code>doki doctor</code> confirm the install. The tarball also ships <code>dokidoki.desktop</code> and <code>dokidoki.png</code> for a menu entry.</p>
+      <h3 class="h3">Runtime dependencies</h3>
+      <p class="sub">The builds use your host's graphics stack instead of bundling it, so install a Vulkan driver and the Wayland/X11 client libraries (Debian/Ubuntu names):</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>sudo apt-get install -y \
+  libvulkan1 mesa-vulkan-drivers \
+  libwayland-client0 libxkbcommon0 libxkbcommon-x11-0 \
+  libfontconfig1 fontconfig libxcb1 libxcb-xkb1</code></pre>
+      </div>
+      <h3 class="h3">Build from source</h3>
+      <p class="sub">Install the GPUI build dependencies (Debian/Ubuntu names):</p>
       <div class="code">
         <button type="button" class="copy">Copy</button>
         <pre><code>sudo apt-get install -y \
