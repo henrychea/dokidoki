@@ -268,7 +268,8 @@ fn runs_in_a_temp_dir_never_the_repo() {
     assert!(run.status.success());
     let cwd = PathBuf::from(shims.field("cwd").unwrap());
     assert_ne!(cwd, repo.path());
-    assert!(cwd.starts_with(std::env::temp_dir()), "{cwd:?}");
+    let temp_root = std::env::temp_dir().canonicalize().unwrap();
+    assert!(cwd.starts_with(&temp_root), "{cwd:?}");
     assert_eq!(shims.field("prompt-file").as_deref(), Some("yes"));
     assert_eq!(
         shims.field("argv").unwrap(),

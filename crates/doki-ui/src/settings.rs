@@ -1128,6 +1128,8 @@ impl DokiApp {
                             .justify_between()
                             .child(
                                 v_flex()
+                                    .flex_1()
+                                    .min_w_0()
                                     .gap(px(2.))
                                     .child(
                                         div()
@@ -1138,6 +1140,7 @@ impl DokiApp {
                                     )
                                     .child(
                                         div()
+                                            .truncate()
                                             .text_size(px(11.))
                                             .font_family(fonts::MONO)
                                             .text_color(p.text_dim)
@@ -1148,6 +1151,7 @@ impl DokiApp {
                             )
                             .child(
                                 h_flex()
+                                    .flex_shrink_0()
                                     .gap(px(6.))
                                     .child(self.settings_text_button(
                                         "settings-save".into(),

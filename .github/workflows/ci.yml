@@ -101,3 +101,59 @@ jobs:
           path: doki
           if-no-files-found: error
           retention-days: 7
+
+  macos:
+    name: macOS app
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace
+
+      - name: Build
+        run: cargo build --release --locked -p doki
+
+      - name: Smoke test
+        run: |
+          ./target/release/doki --version
+          ./target/release/doki --help > /dev/null
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Build app bundle
+        run: |
+          version="$(./target/release/doki --version | awk '{print $2}')"
+          bash packaging/build-macos-app.sh \
+            --binary target/release/doki \
+            --version "$version" \
+            --arch aarch64 \
+            --outdir dist
+
+      - name: Upload app zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: doki-macos-aarch64-zip
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload disk image
+        uses: actions/upload-artifact@v4
+        with:
+          name: doki-macos-aarch64-dmg
+          path: dist/*.dmg
+          if-no-files-found: error
+          retention-days: 7

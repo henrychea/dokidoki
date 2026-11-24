@@ -1,6 +1,6 @@
 # dokidoki
 
-**dokidoki — auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux.**
+**dokidoki — auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux and macOS.**
 
 [![CI](https://github.com/henrychea/dokidoki/actions/workflows/ci.yml/badge.svg)](https://github.com/henrychea/dokidoki/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -46,10 +46,11 @@ run.
   and cherry-picks are refused rather than repaired.
 - **A desktop app and a CLI** built on Rust and GPUI: repository tree, diff
   inspector, AI Commit Studio with an editable subject and 72-character
-  counter, journal, settings, tray, and two themes with bundled fonts.
+  counter, journal, settings, a tray on Linux, and two themes with bundled
+  fonts.
 - **Local-first.** No account, no telemetry, no token storage. Credentials come
   from your existing git configuration and credential helper; state is a SQLite
-  file under `XDG_STATE_HOME`.
+  file under `XDG_STATE_HOME` (`~/.local/state/doki` on macOS).
 
 ## How it compares
 
@@ -67,7 +68,8 @@ guardrails. These tools overlap, but they solve different parts of the problem.
 
 ## Install
 
-Linux x86_64 and aarch64. Prebuilt AppImages and tarballs are on the
+Linux x86_64 and aarch64, and macOS Apple Silicon and Intel. Prebuilt
+AppImages, tarballs, and macOS disk images are on the
 [releases page](https://github.com/henrychea/dokidoki/releases/latest); building
 from source is documented below.
 
@@ -81,6 +83,20 @@ chmod +x dokidoki-<version>-x86_64.AppImage
 # tarball: extract and put doki on PATH
 tar -xzf doki-<version>-x86_64-unknown-linux-gnu.tar.gz
 install -m755 doki-<version>-x86_64-unknown-linux-gnu/doki ~/.local/bin/doki
+
+# macOS: open the disk image, then drag Doki onto Applications
+open doki-<version>-aarch64-apple-darwin.dmg
+
+# or unzip the app bundle directly
+ditto -x -k doki-<version>-aarch64-apple-darwin.zip /Applications
+```
+
+The macOS builds are ad-hoc signed, not notarized, so Gatekeeper refuses the
+first launch. Right-click `Doki` > `Open`, then `Open` in the dialog, or clear
+the quarantine flag once:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/Doki.app
 ```
 
 Use `aarch64` instead of `x86_64` on ARM. Every release publishes `SHA256SUMS`
@@ -89,6 +105,8 @@ next to the artifacts; run this in the download directory to verify:
 ```sh
 sha256sum -c SHA256SUMS
 ```
+
+On macOS `shasum -a 256 -c SHA256SUMS` does the same job.
 
 The tarball also contains `dokidoki.desktop` and `dokidoki.png` if you want a
 menu entry:
@@ -100,7 +118,7 @@ install -Dm644 dokidoki.png ~/.local/share/icons/hicolor/256x256/apps/dokidoki.p
 
 `doki --version` and `doki doctor` confirm the install.
 
-### Runtime dependencies
+### Runtime dependencies (Linux)
 
 The downloads link against the host graphics stack instead of bundling it, so a
 Vulkan driver plus the usual Wayland/X11 client libraries must be present.
@@ -136,9 +154,12 @@ sudo pacman -S --needed \
 driver, so replace `mesa-vulkan-drivers` or `vulkan-radeon` with the package
 for your GPU (NVIDIA, Intel, or another Mesa ICD).
 
+There is nothing to install on macOS: `Doki.app` links only against system
+frameworks.
+
 ### Build from source
 
-Install the GPUI build dependencies first (Debian/Ubuntu names):
+On Linux, install the GPUI build dependencies first (Debian/Ubuntu names):
 
 ```sh
 sudo apt-get install -y \
@@ -149,16 +170,34 @@ sudo apt-get install -y \
   libxcb-xfixes0-dev libxcb-xkb-dev
 ```
 
-Then build and install the binary from a checkout:
+On macOS, install the Xcode command line tools and Rust:
+
+```sh
+xcode-select --install
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Then build from a checkout — `cargo install` on Linux, or the app bundle on
+macOS, where `packaging/build-macos-app.sh` writes `Doki.app`, the `.dmg`, and
+the `.zip` and needs [uv](https://docs.astral.sh/uv/) on `PATH` for `dmgbuild`:
 
 ```sh
 git clone https://github.com/henrychea/dokidoki.git
 cd dokidoki
+
+# Linux
 cargo install --path crates/doki
+
+# macOS (x86_64 on Intel)
+cargo build --release -p doki
+bash packaging/build-macos-app.sh \
+  --binary target/release/doki --version <version> --arch aarch64
 ```
 
-`doki --version` and `doki doctor` confirm the install. `doki` is not published
-on crates.io yet; `cargo install --path crates/doki` is the supported route.
+`doki --version` and `doki doctor` confirm the install: `cargo install` puts the
+CLI on `PATH`, and `dist/Doki.app` is ready to drag to `/Applications`. `doki`
+is not published on crates.io yet; `cargo install --path crates/doki` is the
+supported route.
 
 Optional but useful: [gitleaks](https://github.com/gitleaks/gitleaks) on
 `PATH`. Without it, doki falls back to its built-in scanner.
@@ -183,8 +222,8 @@ Optional but useful: [gitleaks](https://github.com/gitleaks/gitleaks) on
    ```
 
    Discovery is not management: every detected repository starts disabled.
-   Enable it in **All Trees**, then run `doki doctor` to check git, agents,
-   inotify, notifications, and the timer.
+   Enable it in **All Trees**, then run `doki doctor` to check git, agents, and
+   on Linux inotify, notifications, and the timer.
 
 3. **Preview, then sync:**
 
@@ -272,22 +311,24 @@ flag is passed. The full set of keys and the resolution order are documented in
 | Command | What it does |
 |---|---|
 | `doki` | Open the window; the scheduler runs inside it |
-| `doki run --background [--no-tray]` | Scheduler and worker pool without a window, with an optional tray |
+| `doki run --background [--no-tray]` | Scheduler and worker pool without a window, with an optional tray on Linux |
 | `doki sync --repo <path> [--dry-run]` | Commit and push one repository |
 | `doki sync --all [--dry-run]` | Every enabled repository |
 | `doki sync --due [--dry-run]` | Only repositories whose persisted `next_run_at` is due |
 | `doki status [--json]` | Discover repositories and print their state |
 | `doki agents list` | Show each CLI, whether it is on `PATH`, and its model |
 | `doki agents test [<id>]` | Run one fixed prompt through a CLI |
-| `doki doctor` | Probe git, gitleaks, agents, config, state dir, inotify, D-Bus, and the timer |
-| `doki install-timer [--force-write]` | Write systemd user units and print the enable command |
+| `doki doctor` | Probe git, gitleaks, agents, config, state dir, and the platform integrations (inotify, D-Bus, timer on Linux) |
+| `doki install-timer [--force-write]` | Write systemd user units and print the enable command (Linux only) |
 | `doki uninstall-timer` | Print the disable command and remove doki-managed units |
 | `doki undo <repo>` | Move HEAD back to the last run's pre-sync snapshot |
 | `doki reset-quarantine <repo>` | Clear quarantine so the scheduler retries |
 
-`doki doctor` exits non-zero when any probe is `FAIL`. `install-timer` never
-runs `systemctl`; it prints the command for you to run. Only units carrying the
-`# doki-managed` marker are removed by `uninstall-timer`.
+`doki doctor` exits non-zero when any probe is `FAIL`. On macOS the inotify,
+desktop notification, and systemd timer probes warn instead, because those
+integrations are Linux only. `install-timer` never runs `systemctl`; it prints
+the command for you to run. Only units carrying the `# doki-managed` marker are
+removed by `uninstall-timer`.
 
 ## Safety guarantees
 
@@ -356,9 +397,12 @@ flag. `doki agents test` proves an adapter works before you rely on it.
 
 ### Does it sync while the window is closed?
 
-Yes. Run `doki run --background` for a scheduler with an optional tray icon, or
-run `doki install-timer` to generate a systemd user timer that calls
-`doki sync --due`. doki never edits your crontab.
+Yes on both platforms, with different plumbing. `doki run --background`
+schedules syncs without a window and shows a tray icon on Linux. On Linux you
+can also run `doki install-timer` to generate a systemd user timer that calls
+`doki sync --due`. macOS has no tray and no timer integration yet, so start
+`doki run --background` yourself if you want the scheduler without the window.
+doki never edits your crontab.
 
 ## Roadmap
 
@@ -373,6 +417,7 @@ storage are non-goals.
 Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 for the Linux build dependencies, the `fmt`/`clippy`/`test` gates, the
 `doki: <why>` commit style, and the safety invariants a change must not weaken.
+The macOS app builds from the same checkout with the steps above.
 Security reports go through [SECURITY.md](SECURITY.md), and participation is
 covered by the [Code of Conduct](CODE_OF_CONDUCT.md). Notable changes are
 recorded in [CHANGELOG.md](CHANGELOG.md).

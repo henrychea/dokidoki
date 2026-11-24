@@ -256,8 +256,9 @@ impl Store {
                      git_common_dir = excluded.git_common_dir",
             )?;
             for r in repos {
+                let path = r.path.canonicalize().unwrap_or_else(|_| r.path.clone());
                 stmt.execute(params![
-                    r.path.to_string_lossy(),
+                    path.to_string_lossy(),
                     r.root,
                     r.git_common_dir.as_ref().map(|p| p.to_string_lossy())
                 ])?;

@@ -44,7 +44,10 @@ pub fn run_with_env(agent: &Resolved, prompt: &str, env: &[(&str, &str)]) -> Res
         .prefix("doki-agent-")
         .tempdir()
         .context("create agent temp dir")?;
-    let tmp = dir.path().to_path_buf();
+    let tmp = dir
+        .path()
+        .canonicalize()
+        .unwrap_or_else(|_| dir.path().to_path_buf());
     std::fs::write(tmp.join("prompt.txt"), prompt).context("write prompt.txt")?;
     let (argv, prompt_via, last_message_file) = agent.argv(&tmp, prompt)?;
 
