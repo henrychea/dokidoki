@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>dokidoki — AI git auto-commit &amp; auto-sync for Linux</title>
-<meta name="description" content="dokidoki (from 同期, dōki: to sync) auto-commits and auto-syncs your git repos with AI commit messages. A safe, local-first Rust + GPUI desktop app and CLI for Linux: never force-pushes, scans for secrets, supports dry run and undo.">
+<title>dokidoki — AI git auto-commit &amp; auto-sync for Linux and macOS</title>
+<meta name="description" content="dokidoki (from 同期, dōki: to sync) auto-commits and auto-syncs your git repos with AI commit messages. A safe, local-first Rust + GPUI desktop app and CLI for Linux and macOS: never force-pushes, scans for secrets, supports dry run and undo.">
 <link rel="canonical" href="https://henrychea.github.io/dokidoki/">
 <meta name="theme-color" content="#0b0c0e" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#faf9f5" media="(prefers-color-scheme: light)">
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="dokidoki">
-<meta property="og:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux">
+<meta property="og:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux and macOS">
 <meta property="og:description" content="Auto-commit and auto-sync your git repos with AI commit messages. Local-first, never force-pushes, dry run and undo.">
 <meta property="og:url" content="https://henrychea.github.io/dokidoki/">
 <meta property="og:image" content="https://henrychea.github.io/dokidoki/assets/sumi.png">
@@ -21,7 +21,7 @@
 <meta property="og:image:height" content="1024">
 <meta property="og:image:alt" content="The dokidoki desktop app in the Sumi dark theme">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux">
+<meta name="twitter:title" content="dokidoki — AI git auto-commit &amp; auto-sync for Linux and macOS">
 <meta name="twitter:description" content="Auto-commit and auto-sync your git repos with AI commit messages. Local-first, never force-pushes, dry run and undo.">
 <meta name="twitter:image" content="https://henrychea.github.io/dokidoki/assets/sumi.png">
 <meta name="twitter:image:alt" content="The dokidoki desktop app in the Sumi dark theme">
@@ -34,9 +34,9 @@
   "@type": "SoftwareApplication",
   "name": "dokidoki",
   "alternateName": "doki",
-  "description": "Auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux.",
+  "description": "Auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux and macOS.",
   "url": "https://henrychea.github.io/dokidoki/",
-  "operatingSystem": "Linux",
+  "operatingSystem": "Linux, macOS",
   "applicationCategory": "DeveloperApplication",
   "image": "https://henrychea.github.io/dokidoki/assets/sumi.png",
   "license": "https://opensource.org/licenses/MIT",
@@ -88,7 +88,7 @@
         </div>
         <p class="eyebrow"><span lang="ja">同期</span> dōki · to sync</p>
         <h1 id="hero-title">Your repos, with a <span class="beat">heartbeat</span>.</h1>
-        <p class="lede">dokidoki — auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux.</p>
+        <p class="lede">dokidoki — auto-commit and auto-sync your git repos with AI commit messages. A safe, local-first desktop app (Rust + GPUI) for Linux and macOS.</p>
         <p class="pun">Doubled, doki-doki also echoes <span lang="ja">ドキドキ</span>, the sound of a racing heart: every sync is a heartbeat.</p>
         <div class="cta">
           <a class="btn primary" href="https://github.com/henrychea/dokidoki">View on GitHub</a>
@@ -215,7 +215,7 @@ doki-core          main            <span class="ok">clean</span>
     <div class="wrap">
       <div class="label"><span lang="ja" class="kanji">導入</span><span>Install</span></div>
       <h2 id="install-title">Install and quick start</h2>
-      <p class="sub">Prebuilt Linux builds for x86_64 and aarch64 are on the <a href="https://github.com/henrychea/dokidoki/releases/latest">releases page</a>, with <code>SHA256SUMS</code> alongside every artifact.</p>
+      <p class="sub">Prebuilt builds for Linux (x86_64, aarch64) and macOS (Apple Silicon, Intel) are on the <a href="https://github.com/henrychea/dokidoki/releases/latest">releases page</a>, with <code>SHA256SUMS</code> alongside every artifact.</p>
       <h3 class="h3">Download</h3>
       <div class="code">
         <button type="button" class="copy">Copy</button>
@@ -225,10 +225,18 @@ chmod +x dokidoki-&lt;version&gt;-x86_64.AppImage
 
 # tarball: extract and put doki on PATH
 tar -xzf doki-&lt;version&gt;-x86_64-unknown-linux-gnu.tar.gz
-install -m755 doki-&lt;version&gt;-x86_64-unknown-linux-gnu/doki ~/.local/bin/doki</code></pre>
+install -m755 doki-&lt;version&gt;-x86_64-unknown-linux-gnu/doki ~/.local/bin/doki
+
+# macOS: open the disk image, then drag Doki onto Applications
+open doki-&lt;version&gt;-aarch64-apple-darwin.dmg</code></pre>
       </div>
-      <p class="sub">Verify the downloads with <code>sha256sum -c SHA256SUMS</code>; <code>doki --version</code> and <code>doki doctor</code> confirm the install. The tarball also ships <code>dokidoki.desktop</code> and <code>dokidoki.png</code> for a menu entry.</p>
-      <h3 class="h3">Runtime dependencies</h3>
+      <p class="sub">The macOS builds are ad-hoc signed, not notarized, so Gatekeeper refuses the first launch: right-click <code>Doki</code> &gt; <code>Open</code>, then <code>Open</code> in the dialog, or clear the quarantine flag once:</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>xattr -dr com.apple.quarantine /Applications/Doki.app</code></pre>
+      </div>
+      <p class="sub">Verify the downloads with <code>sha256sum -c SHA256SUMS</code> (<code>shasum -a 256 -c SHA256SUMS</code> on macOS); <code>doki --version</code> and <code>doki doctor</code> confirm the install. The tarball also ships <code>dokidoki.desktop</code> and <code>dokidoki.png</code> for a menu entry.</p>
+      <h3 class="h3">Runtime dependencies (Linux)</h3>
       <p class="sub">The builds use your host's graphics stack instead of bundling it, so install a Vulkan driver and the Wayland/X11 client libraries (Debian/Ubuntu names):</p>
       <div class="code">
         <button type="button" class="copy">Copy</button>
@@ -237,6 +245,7 @@ install -m755 doki-&lt;version&gt;-x86_64-unknown-linux-gnu/doki ~/.local/bin/do
   libwayland-client0 libxkbcommon0 libxkbcommon-x11-0 \
   libfontconfig1 fontconfig libxcb1 libxcb-xkb1</code></pre>
       </div>
+      <p class="sub">There is nothing to install on macOS: <code>Doki.app</code> links only against system frameworks.</p>
       <h3 class="h3">Build from source</h3>
       <p class="sub">Install the GPUI build dependencies (Debian/Ubuntu names):</p>
       <div class="code">
@@ -248,12 +257,25 @@ install -m755 doki-&lt;version&gt;-x86_64-unknown-linux-gnu/doki ~/.local/bin/do
   libx11-xcb-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
   libxcb-xfixes0-dev libxcb-xkb-dev</code></pre>
       </div>
+      <p class="sub">On macOS, install the Xcode command line tools and Rust instead; there is nothing else to add.</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>xcode-select --install
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></pre>
+      </div>
       <p class="sub">Then build and install the binary from a checkout. <code>doki --version</code> and <code>doki doctor</code> confirm the install.</p>
       <div class="code">
         <button type="button" class="copy">Copy</button>
         <pre><code>git clone https://github.com/henrychea/dokidoki.git
 cd dokidoki
 cargo install --path crates/doki</code></pre>
+      </div>
+      <p class="sub">On macOS the same checkout builds the app bundle, the disk image, and the zip. The disk image needs <code>uv</code> on <code>PATH</code> for <code>dmgbuild</code>.</p>
+      <div class="code">
+        <button type="button" class="copy">Copy</button>
+        <pre><code>cargo build --release -p doki
+bash packaging/build-macos-app.sh \
+  --binary target/release/doki --version &lt;version&gt; --arch aarch64</code></pre>
       </div>
       <h3 class="h3">Quick start</h3>
       <p class="sub">1. Point doki at your repositories in <code>${XDG_CONFIG_HOME:-~/.config}/doki/config.toml</code>:</p>
@@ -273,7 +295,7 @@ doki doctor
 doki sync --all --dry-run
 doki sync --all</code></pre>
       </div>
-      <p class="sub">Run <code>doki install-timer</code> to keep syncing while the window is closed. Optional: <a href="https://github.com/gitleaks/gitleaks">gitleaks</a> on <code>PATH</code>.</p>
+      <p class="sub">Run <code>doki install-timer</code> on Linux to keep syncing while the window is closed. Optional: <a href="https://github.com/gitleaks/gitleaks">gitleaks</a> on <code>PATH</code>.</p>
     </div>
   </section>
 
@@ -334,7 +356,7 @@ doki sync --all</code></pre>
       </details>
       <details>
         <summary>Does it sync while the window is closed?</summary>
-        <p>Yes. Run <code>doki run --background</code> for a scheduler with an optional tray icon, or run <code>doki install-timer</code> to generate a systemd user timer that calls <code>doki sync --due</code>. doki never edits your crontab.</p>
+        <p>Yes on both platforms, with different plumbing. <code>doki run --background</code> schedules syncs without a window and shows a tray icon on Linux. On Linux you can also run <code>doki install-timer</code> to generate a systemd user timer that calls <code>doki sync --due</code>. macOS has no tray and no timer integration yet, so start <code>doki run --background</code> yourself if you want the scheduler without the window. doki never edits your crontab.</p>
       </details>
     </div>
   </section>

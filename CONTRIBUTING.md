@@ -6,7 +6,8 @@ with a GPUI desktop app and a CLI; the internals are described in
 
 ## Development setup
 
-Linux is the primary target. Install the system libraries GPUI needs:
+Linux and macOS are supported. On Linux, install the system libraries GPUI
+needs:
 
 ```sh
 sudo apt-get install -y \
@@ -15,6 +16,14 @@ sudo apt-get install -y \
   libfontconfig-dev libvulkan-dev \
   libx11-xcb-dev libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
   libxcb-xfixes0-dev libxcb-xkb-dev
+```
+
+On macOS, install the Xcode command line tools and Rust. The app links only
+against system frameworks, so there is nothing else to install:
+
+```sh
+xcode-select --install
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 You also need Git on `PATH`. Any one of `omp`, `codex`, `claude`, `opencode`,
@@ -32,6 +41,21 @@ under `${XDG_STATE_HOME:-~/.local/state}/doki`. For manual testing, point
 `HOME`, `XDG_CONFIG_HOME`, and `XDG_STATE_HOME` at a scratch directory so your
 real configuration and journals stay untouched.
 
+### macOS app and disk image
+
+`packaging/build-macos-app.sh` builds `dist/Doki.app`, signs it ad hoc, and
+writes the `.dmg` and `.zip` beside it. The disk image needs
+[uv](https://docs.astral.sh/uv/) on `PATH` for `dmgbuild`; the script never
+opens a Finder window, so it is safe to run over SSH or in CI.
+
+```sh
+cargo build --release -p doki
+bash packaging/build-macos-app.sh \
+  --binary target/release/doki --version <version> --arch aarch64
+```
+
+Use `x86_64` on Intel. `dist/Doki.app` runs in place without an install step.
+
 ## Gates
 
 Every change must pass all three before review:
@@ -42,8 +66,9 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-CI runs the same commands on `ubuntu-latest`. A pull request that leaves a
-warning or a failing test is not ready.
+CI runs the same commands on `ubuntu-latest` and `macos-15`, and the GUI tests
+run in both. A pull request that leaves a warning or a failing test is not
+ready.
 
 ## Commit style
 

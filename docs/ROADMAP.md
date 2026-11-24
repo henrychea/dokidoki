@@ -19,8 +19,9 @@ and `cargo test --workspace` are green.
 | P5 | UI frame: header, workspace dock, repo tree, live status from the worker pool | done |
 | P6 | UI center: repo header, guard chips, AI Commit Studio, file tabs, diff view, empty/blocked/dry-run states | done |
 | P7 | UI journal and themes: All/Runs/Alerts journal, sync-rate footer, Sumi/Washi/system themes, keys, settings | done |
-| P8 | Ops: systemd user timer, `doki run --background`, tray, `doki doctor` | done |
+| P8 | Ops: systemd user timer, `doki run --background`, tray (Linux), `doki doctor` | done |
 | P9 | Final acceptance: full suite, design comparison, screenshots | done |
+| P10 | macOS: `Doki.app` bundle, ad-hoc signed DMG and zip, custom DMG background, macOS CI job | done |
 
 ## Next
 
@@ -29,6 +30,9 @@ and `cargo test --workspace` are green.
 | P0 | Bundle snapshots with optional upload | Real backup for repos without a remote |
 | P1 | Re-read `.doki.toml` after a pull | A tightened policy should take effect without a rescan |
 | P1 | Per-root model defaults | Fewer overrides on large trees |
+| P1 | Notarized macOS build | The ad-hoc signed DMG needs a right-click to open |
+| P2 | Menu bar item on macOS | The tray is `ksni` (StatusNotifierItem over D-Bus), so macOS has no icon |
+| P2 | launchd timer generator | `doki install-timer` writes systemd units only |
 | P2 | Multi-machine lease refs | Two hosts pushing the same repo without racing |
 | P2 | Read-only AI conflict summary | Explain both sides; still never auto-resolve |
 | P2 | Repo health report | Stale branches, large blobs, unpushed tags, LFS |
@@ -43,4 +47,5 @@ and `cargo test --workspace` are green.
 - Editing the user's crontab.
 - GitHub/GitLab API integration in v1.
 - Watching every file in very large monorepos; poll instead.
-- Cross-platform polish. Linux first; gpui-kit keeps macOS/Windows possible.
+- Windows support. Linux and macOS are supported; gpui-kit keeps Windows
+  possible.

@@ -4,9 +4,9 @@ Copy these values into the repository settings after the code is published.
 
 ## About
 
-**Description** (306 characters, limit 350):
+**Description** (316 characters, limit 350):
 
-> dokidoki is a local-first desktop app and CLI that auto-commits changed git repositories with AI-written messages (Claude Code, Codex, OpenCode, omp, pi) and safely pushes them on a schedule. It never force-pushes, scans for secrets before any model call, and supports dry run and undo. Rust + GPUI, Linux.
+> dokidoki is a local-first desktop app and CLI that auto-commits changed git repositories with AI-written messages (Claude Code, Codex, OpenCode, omp, pi) and safely pushes them on a schedule. It never force-pushes, scans for secrets before any model call, and supports dry run and undo. Rust + GPUI, Linux and macOS.
 
 **Website**:
 
@@ -26,6 +26,7 @@ gpui
 rust
 desktop-app
 linux
+macos
 developer-tools
 backup
 claude-code
@@ -35,7 +36,6 @@ automation
 git-automation
 local-first
 systemd
-kde
 wayland
 ```
 

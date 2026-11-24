@@ -1,6 +1,6 @@
 # dokidoki — design notes
 
-Status: implemented through 0.1.0. This document records the decisions behind the shipped app.
+Status: implemented through 0.2.0 on Linux and macOS. This document records the decisions behind the shipped app.
 Binary name: `doki`. Commit-message prefix: `doki: `.
 
 ## 1. Goal
@@ -23,6 +23,7 @@ Each AI CLI has its own configurable model. A repo can override the CLI and mode
 | Repository | Rust workspace for the `dokidoki` project; no prior code required |
 | Toolchain | Rust stable with edition 2024 support (developed against rustc/cargo 1.99.1) |
 | GUI deps (Linux) | Wayland, libxkbcommon, fontconfig, and a Vulkan ICD |
+| GUI deps (macOS) | Xcode command line tools; the app links only against system frameworks |
 | `gpui` | 0.2.2 on crates.io, upstream Zed |
 | `gpui-kit` | 0.10.0, wraps a GPUI fork (`gpui-base`), 75+ widgets, tables, virtual lists, dock, modals |
 | Agent CLIs | any of `omp`, `codex`, `opencode`, `claude`, `pi`; install the ones you want to use |
@@ -68,12 +69,12 @@ assets/fonts/              bundled Inter + JetBrains Mono (OFL)
 
 ```
 doki                 UI (default); scheduler runs inside while open
-doki run --background scheduler only, optional tray icon
+doki run --background scheduler only, optional tray icon (Linux)
 doki sync [...]      one-shot sync: --all, --due, --repo <path>, --dry-run
 doki status          table or --json
 doki agents list|test
-doki doctor          environment, auth, inotify limits, agent availability
-doki install-timer   writes systemd user units
+doki doctor          environment, auth, agent availability, platform limits (inotify on Linux)
+doki install-timer   writes systemd user units (Linux)
 doki undo <repo>
 ```
 
@@ -198,9 +199,9 @@ Precedence: `.doki.toml` (tightening only) > `[[overrides]]` > `[agents.*]` > de
 - Skip `skip_names`, symlinks, permission-denied subtrees, and network mounts flagged in config.
 - Canonicalize paths. Dedupe worktrees via `git rev-parse --git-common-dir`; a second worktree of the same repo is a separate entry with its own state, but shares the common-dir lock for destructive operations.
 - Store detected repos with `enabled = false`. The UI shows them in a "Detected" section with an Enable action.
-- Watch with `notify` on each managed repo root plus `.git/HEAD`, `.git/index`, `.git/refs`. Debounce 3 s. Ignore `.git/objects`.
+- Watch with `notify` on each managed repo root plus `.git/HEAD`, `.git/index`, `.git/refs`. Debounce 3 s. Ignore `.git/objects`. `notify` uses inotify on Linux and FSEvents on macOS; the `doki doctor` inotify probe reads the Linux watch limit and stays Linux only.
 - Watch count is capped (configurable, default 2048). On overflow, drop to polling for that root and raise a warning.
-- Full rescan every `rescan_minutes` catches new repos and missed events. Inotify is not a reliable store of record.
+- Full rescan every `rescan_minutes` catches new repos and missed events. A native watcher is not a reliable store of record.
 - Submodules are listed but not committed or pushed by default. Their state is shown as a warning.
 
 ## 7. Scheduling and execution
@@ -209,7 +210,7 @@ Precedence: `.doki.toml` (tightening only) > `[[overrides]]` > `[agents.*]` > de
 - Scheduler wakes every 30 s, computes due repos from persisted `next_run_at`, uses wall clock to survive suspend. At most one catch-up run per repo.
 - Jitter of 0–60 s per repo to avoid a thundering herd.
 - Backoff: `2^failures` minutes, capped. After `quarantine_after` consecutive failures, repo enters `Quarantined` and needs manual reset.
-- In-app scheduler is a convenience. The reliable path is a systemd user timer:
+- In-app scheduler is a convenience. On Linux the reliable path is a systemd user timer:
 
 ```ini
 # doki.timer
@@ -221,7 +222,7 @@ Persistent=true
 ExecStart=%h/.cargo/bin/doki sync --due
 ```
 
-`doki install-timer` writes these units and prints the `systemctl --user` commands. It never edits crontab. If crontab support is added, it must be explicit, show the before/after file, and keep a backup.
+`doki install-timer` writes these units and prints the `systemctl --user` commands. It never edits crontab. If crontab support is added, it must be explicit, show the before/after file, and keep a backup. macOS has no timer integration yet: keep the window open or start `doki run --background` yourself. A launchd generator is a follow-up.
 
 ## 8. Sync pipeline
 
@@ -317,8 +318,8 @@ Run the secret scan on the staged diff **before** building the prompt. If the sc
 
 ## 10. Conflicts and notifications
 
-- `notify-rust` over freedesktop notifications. Coalesce per repo. Actions: Open, Retry, Abort.
-- No notification daemon: in-app inbox plus tray badge (`ksni`).
+- `notify-rust`: freedesktop notifications on Linux, `mac-notification-sys` on macOS. Coalesce per repo. Actions: Open, Retry, Abort.
+- No notification daemon: in-app inbox, plus a tray badge on Linux (`ksni`).
 - Incident fields: repo, step, exit code, classified kind, stderr tail, agent/model used, suggested actions.
 - Conflict panel: `git diff --name-only --diff-filter=U`, buttons Abort rebase, Open terminal, Open editor (`$VISUAL`/`$EDITOR`/`zed`/`code`), Retry.
 - Retry validates: no unmerged paths, no rebase/merge state, lock free. Otherwise it explains exactly what is still wrong.
@@ -336,9 +337,9 @@ Rules: 10–13 px type, 1 px hairlines, flat panes, 4 px spacing rhythm. No grad
 
 ### 11.2 Frame
 
-- Window 1280×900 default, minimum 1100×720. Native KDE decorations; do not fake macOS traffic lights.
+- Window 1280×900 default, minimum 1100×720. Native system decorations: KDE on Linux, the system titlebar on macOS; do not fake traffic lights.
 - Header 44 px: wordmark, version pill, root tabs separated by `/`, next-sync countdown with pine dot, Dry Run toggle, Filter, Sync All, avatar.
-- Left dock 268 px (resizable 200–380): `Workspaces` + add; nav **All Trees** (count), **Diff Inspector**, **AI Commit** (pending count); root groups with repo counts; repo rows; disabled group; footer with timer state (`systemd: doki.timer`, `every 20m`) and `Safe Guards · Armed`.
+- Left dock 268 px (resizable 200–380): `Workspaces` + add; nav **All Trees** (count), **Diff Inspector**, **AI Commit** (pending count); root groups with repo counts; repo rows; disabled group; footer with timer state (`in-app scheduler`, or `systemd: doki.timer` on Linux) and `Safe Guards · Armed`.
 - Center: flexible, minimum 420 px.
 - Right dock 300 px: `Journal & Logs` with All/Runs/Alerts tabs, incident cards, sync-rate footer.
 
@@ -443,6 +444,7 @@ Logs: `tracing` to a rolling file under the state dir, plus an in-memory ring fo
 - Required cases: tracked dirty, untracked only, staged only, hook failure, diverged + rebase conflict, protected branch, missing agent, agent timeout, agent garbage output, model flag omitted when unset, per-repo model override wins, invalid model string rejected, secret finding blocks the model call, mass-delete guard, lock contention, nested repo, symlink loop, depth 2 vs 3 discovery, inotify overflow fallback, quarantine after N failures, undo refusal after push.
 - `doki sync --dry-run` is asserted to run no mutating command.
 - UI: gpui-kit headless harness for render and interaction tests. Manual visual check in a desktop session against the design PNG.
+- CI runs the same gates on `ubuntu-latest` and `macos-15`; the suite stays platform neutral and the macOS job runs the GUI tests too.
 - `doki agents test` doubles as the acceptance check for each adapter (omp and codex verified; others when installed).
 
 ## 15. Milestones
@@ -493,8 +495,8 @@ Logs: `tracing` to a rolling file under the state dir, plus an in-memory ring fo
 - Editing the user's crontab.
 - GitHub/GitLab API integration in v1.
 - Watching every file in very large monorepos; poll instead.
-- Cross-platform polish. Linux first; gpui-kit keeps macOS/Windows possible.
+- Windows support. Linux and macOS are supported; gpui-kit keeps Windows possible.
 
 ## 18. Defaults
 
-`gpui-kit =0.10.0` · Sumi dark default, Washi light option, bundled Inter + JetBrains Mono · window 1280×900 · depth 2 · commit tracked-only · push `origin` current branch · `main`/`master` commit-only · rebase policy `ask` · systemd timer plus in-app scheduler · agent order `omp`, `codex` · model per CLI from `[agents.*]`, omitted flag when unset · prefix `doki: ` always enforced by doki, full subject ≤ 72 chars.
+`gpui-kit =0.10.0` · Sumi dark default, Washi light option, bundled Inter + JetBrains Mono · window 1280×900 · depth 2 · commit tracked-only · push `origin` current branch · `main`/`master` commit-only · rebase policy `ask` · in-app scheduler plus a systemd timer generator on Linux · agent order `omp`, `codex` · model per CLI from `[agents.*]`, omitted flag when unset · prefix `doki: ` always enforced by doki, full subject ≤ 72 chars.

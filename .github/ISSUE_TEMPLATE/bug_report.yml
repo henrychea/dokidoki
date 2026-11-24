@@ -14,16 +14,32 @@ body:
     attributes:
       label: doki version
       description: Output of `doki --version`.
-      placeholder: doki 0.1.0
+      placeholder: doki 0.2.0
     validations:
       required: true
 
   - type: input
     id: environment
     attributes:
-      label: Environment
-      description: Distribution, desktop session (Wayland or X11), and git version.
-      placeholder: Ubuntu 24.04, KDE Plasma 6 on Wayland, git 2.51
+      label: Platform
+      description: >-
+        OS and version, the CPU on macOS (Apple Silicon or Intel), the
+        desktop session on Linux (Wayland or X11), and your git version.
+      placeholder: macOS 15.2 on Apple Silicon, git 2.51
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: Install method
+      description: How this build of doki was installed.
+      options:
+        - DMG (macOS)
+        - zip (macOS)
+        - AppImage (Linux)
+        - tarball (Linux)
+        - built from source
     validations:
       required: true
 
