@@ -6,12 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-24
+
 ### Added
 
-- Linux release packaging: `Release` workflow builds `x86_64` and `aarch64`
-  AppImages and `-unknown-linux-gnu` tarballs with a `SHA256SUMS` file, and
-  publishes them to a GitHub Release on a `v*` tag. `CI` now also builds,
-  strips, smoke-tests, and uploads the Linux binary as an artifact.
+- macOS support: `Release` publishes an ad-hoc signed `Doki.app` as a `.dmg`
+  disk image and a `.zip` archive for `aarch64` and `x86_64`, with a custom
+  disk image background that lays out the drag-to-Applications step and the
+  first-launch instructions. `CI` runs clippy and the full test suite on
+  macOS and uploads both artifacts.
+
+### Fixed
+
+- Repository paths are stored canonicalized, so a root reached through a
+  symlinked prefix (`/var` on macOS) still matches its database row.
+- The agent temp directory is canonicalized before it is handed to a CLI, so
+  the `--cwd` argument matches the working directory the agent reports.
+- The settings header truncates a long config path instead of pushing the
+  Save and Close buttons out of the panel.
 
 ## [0.1.0] - 2026-11-19
 
@@ -48,3 +60,7 @@ First public release.
   editing crontab or running `systemctl`.
 - `doki doctor` environment checks and `doki agents list|test`.
 - SQLite WAL journal for runs, incidents, snapshots, and cached messages.
+- Linux release packaging: the `Release` workflow builds `x86_64` and `aarch64`
+  AppImages and `-unknown-linux-gnu` tarballs with a `SHA256SUMS` file and
+  publishes them to a GitHub Release on a `v*` tag; `CI` builds, strips,
+  smoke-tests, and uploads the Linux binary as an artifact.

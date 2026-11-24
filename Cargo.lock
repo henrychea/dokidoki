@@ -1568,7 +1568,7 @@ dependencies = [
 
 [[package]]
 name = "doki"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -1584,7 +1584,7 @@ dependencies = [
 
 [[package]]
 name = "doki-agent"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "doki-core",
@@ -1593,7 +1593,7 @@ dependencies = [
 
 [[package]]
 name = "doki-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-channel",
@@ -1616,7 +1616,7 @@ dependencies = [
 
 [[package]]
 name = "doki-ui"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "async-channel",
