@@ -18,7 +18,7 @@ chrono = { version = "0.4", default-features = false, features = ["clock", "std"
 cron = "0.17"
 globset.workspace = true
 libc = "0.2"
-notify = "8"
+notify = "9"
 notify-rust = "4"
 rusqlite.workspace = true
 serde.workspace = true
